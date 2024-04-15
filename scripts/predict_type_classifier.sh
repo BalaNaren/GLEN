@@ -9,8 +9,8 @@ then
 fi
 
 python model/predict_type_classifier.py \
-    --path_to_model ./exp/type_classifier_${round}/epoch_1/pytorch_model.bin \
-    --output_path ./exp/type_classifier_${round}/epoch_1 \
+    --path_to_model ./ckpts/type_classifier.bin \
+    --output_path ./output \
     --max_context_length 512 \
     --TC_train_data_path ${data_path} \
     --predict_set ${data} \
