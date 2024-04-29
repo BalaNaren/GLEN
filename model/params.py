@@ -8,6 +8,12 @@ def define_arguments(parser):
         help="random seed",
     )
     parser.add_argument(
+        "--lang",
+        default="en",
+        type=str,
+        help="language",
+    )
+    parser.add_argument(
         "--max_context_length",
         default=128,
         type=int,
@@ -27,7 +33,7 @@ def define_arguments(parser):
     )
     parser.add_argument(
         "--bert_model",
-        default="bert-base-uncased",
+        default="bert-base-multilingual-uncased",
         type=str,
         help="Bert pre-trained model.",
     )

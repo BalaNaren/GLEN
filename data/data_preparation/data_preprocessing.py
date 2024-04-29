@@ -44,7 +44,8 @@ def process_one_data(item, mapping_dict, xpo_nodes, tokenizer, node2id = None, l
     data =  {
         'id': item['id'],
         'text': item['sentence'],
-        'triggers': ['']
+        'triggers': [''],
+        'lang':item['lang']
     }
 
     if no_other:

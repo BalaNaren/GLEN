@@ -97,12 +97,10 @@ def read_dataset(dataset_name, params, tokenizer, truncate = -1, has_true_label=
     with io.open(txt_file_path, mode="r", encoding="utf-8") as file:
         for line in file:
             samples.append(json.loads(line.strip()))
-
-    # if 'debug' in params['output_path']:
-    #     samples = samples[:100]
+            
     if yes_no_format:
         processed_data = process_data_TC_predict_w_sentence(
-            samples=samples,  # use subset of valid data
+            samples=samples, 
             tokenizer=tokenizer,
             max_context_length=params["max_context_length"],
             seed_round=seed_round
@@ -110,7 +108,7 @@ def read_dataset(dataset_name, params, tokenizer, truncate = -1, has_true_label=
         return processed_data
 
     processed_data = process_mention_data(
-        samples=samples,  # use subset of valid data
+        samples=samples,  
         tokenizer=tokenizer,
         max_context_length=params["max_context_length"],
         params=params,
@@ -156,20 +154,6 @@ def eval_trigger_detection(predicted_mention_bounds, mention_idx, mention_idx_ma
 
     return predict_num_list, correct_num_list , gold_num_list, roleset_detail
 
-
-def save_model(model, tokenizer, output_dir):
-    """Saves the model and the tokenizer used in the output directory."""
-    if not os.path.exists(output_dir):
-        os.makedirs(output_dir)
-    output_model_file = os.path.join(output_dir, WEIGHTS_NAME)
-    torch.save(model.state_dict(), output_model_file)
-    tokenizer.save_vocabulary(output_dir)
-
-
-def write_to_file(path, string, mode="w"):
-    with open(path, mode) as f:
-        f.write(string)
-
 def evaluate_final_score(predict_samples, params, eval_on_gold = False):
     c_m_p_threshold = params['c_m_p_threshold']
     num_TD_correct = 0
@@ -184,6 +168,7 @@ def evaluate_final_score(predict_samples, params, eval_on_gold = False):
     for item in tqdm(predict_samples):
         tmp_item = {}
         tmp_item['sent_id'] = item['data_id']
+        tmp_item["lang"]=item["lang"]
         tokens = item['context']['tokens']
         tmp_item['sentence'] = ' '.join(tokens[1:-1]).replace(' ##', '')
         tmp_item['events'] = {}
@@ -258,6 +243,7 @@ def hit_k(predict_samples, eval_on_gold = False):
 
     for item in tqdm(predict_samples):
         tmp_item = {}
+        tmp_item["lang"]=item["lang"]
         tmp_item['sent_id'] = item['data_id']
         tokens = item['context']['tokens']
         tmp_item['sentence'] = ' '.join(tokens[1:-1]).replace(' ##', '')
@@ -294,4 +280,16 @@ def hit_k(predict_samples, eval_on_gold = False):
     for k in hit_at_k_cnt_in_top_10:
         scores[f"Hit@{k}_in_top_10"] = hit_at_k_cnt_in_top_10[k]/matched_trigger_in_top_10
     print(json.dumps(scores, indent=True))
+
+def save_model(model, tokenizer, output_dir):
+    """Saves the model and the tokenizer used in the output directory."""
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+    output_model_file = os.path.join(output_dir, WEIGHTS_NAME)
+    torch.save(model.state_dict(), output_model_file)
+    tokenizer.save_vocabulary(output_dir)
+
+def write_to_file(path, string, mode="w"):
+    with open(path, mode) as f:
+        f.write(string)
 

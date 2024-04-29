@@ -1,4 +1,4 @@
-from transformers import BertTokenizerFast
+from transformers import BertTokenizerFast, BertTokenizer
 
 from torch.utils.data import DataLoader
 import torch
@@ -12,10 +12,11 @@ from model.encoder import TriggerIdentifier, TypeRanking, TypeClassifier
 from model.dataset import SimpleDataset, collate_fn_TI_sen, collate_fn_TR_sen, collate_fn_TC_sen
 
 
-def sentence_tokenization(sentence_list, tokenizer, max_length=512):
+def tokenize_and_format(sentences, tokenizer, max_length=512):
+    tokenizer = BertTokenizer.from_pretrained('bert-base-uncased', do_lower_case=True)
     data = []
-    for sent_id, sentence in enumerate(sentence_list):
-        tokens = tokenizer(sentence, return_offsets_mapping=True, max_length=max_length, padding=False, truncation=True)
+    for sent_id, sentence in enumerate(sentences):
+        tokens = tokenizer(sentence["text"], return_offsets_mapping=True, max_length=max_length, padding=False, truncation=True)
         tokenized_tokens = tokenizer.convert_ids_to_tokens(tokens['input_ids'])
         original_tokenized_text_ids = tokens['input_ids']
         tokenized_text_ids = original_tokenized_text_ids + [0]*(max_length - len(original_tokenized_text_ids))
@@ -23,7 +24,8 @@ def sentence_tokenization(sentence_list, tokenizer, max_length=512):
         
         data.append({
             'sen_id': sent_id,
-            'sentence': sentence,
+            'sentence': sentence["text"],
+            'lang': sentence["lang"],
             'original_tokenized_text_ids': original_tokenized_text_ids,
             'tokenized_text_ids': tokenized_text_ids,
             'token_offsets': tokens['offset_mapping'],
@@ -45,7 +47,7 @@ def setup(params):
 
 
 def predict(sentence_list, params, tokenizer, trigger_identifier, type_ranking, type_classifier, device, cand_encs, used_cand):
-    predict_samples = sentence_tokenization(sentence_list, tokenizer, max_length=512)
+    predict_samples = tokenize_and_format(sentence_list, tokenizer, max_length=512)
 
     # trigger identification
     predict_set = SimpleDataset(predict_samples)
@@ -143,10 +145,12 @@ if __name__ == '__main__':
     params = parse_arguments()
     tokenizer, trigger_identifier, type_ranking, type_classifier, device, cand_encs, used_cand = setup(params)
     
-    
-    sen_list = ['One Air Force technician died and 21 others were injured .']
-    print(f"start predicting {len(sen_list)} sentence")
-    print(predict(sen_list, params, tokenizer, trigger_identifier, type_ranking, type_classifier, device, cand_encs, used_cand))
+    sentences=[{
+        "text": "One Air Force technician died and 21 others were injured .",
+        "lang":"en"
+    }]
+    print(f"start predicting {len(sentences)} sentence")
+    print(predict(sentences, params, tokenizer, trigger_identifier, type_ranking, type_classifier, device, cand_encs, used_cand))
 
 
 

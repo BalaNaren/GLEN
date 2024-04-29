@@ -428,7 +428,7 @@ def process_data_TC_predict(params, predict_samples, tokenizer, eval_on_gold=Tru
             trigger_iter = enumerate(item['context']['mention_idxs'])
         else:
             trigger_iter = enumerate(item['predicted_triggers'])
-        
+        language=item['lang']
         for eid, trigger in trigger_iter:
             cnt_events += 1
             for node in types_for_sentence:
@@ -436,6 +436,7 @@ def process_data_TC_predict(params, predict_samples, tokenizer, eval_on_gold=Tru
                 processed_samples.append({
                     'id': item_id,
                     'event_idx': eid,
+                    'lang':language,
                     'event_id': node,
                     'input_ids': input_ids,
                     'label': -1,
