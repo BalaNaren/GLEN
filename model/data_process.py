@@ -270,8 +270,12 @@ def process_data_TC_predict_w_sentence(
     samples,
     tokenizer,
     max_context_length,
+    lang
 ):
-    template = f"⟨type⟩ is defined as ⟨definition⟩. ⟨sentence⟩ Does ⟨trigger⟩ indicate a ⟨type⟩ event? [MASK]"
+    if lang=="it":
+        template = f"〈type〉 e definito come ` 〈definition〉. 〈sentence〉. Il 〈trigger〉 indica un evento di tipo 〈type〉? [MASK]"
+    else:
+        template = f"⟨type⟩ is defined as ⟨definition⟩. ⟨sentence⟩ Does ⟨trigger⟩ indicate a ⟨type⟩ event? [MASK]"
 
     processed_samples = []    
     for sample in tqdm(samples):
@@ -308,9 +312,14 @@ def process_data_TC_predict_w_sentence(
     print(f"get {len(processed_samples)} samples")
     return processed_samples
 
-def create_TC_input(node, item, trigger, tokenizer, max_context_length):
-    prefix_template = f"⟨type⟩ is defined as ⟨definition⟩."
-    suffix_template = f"Does ⟨trigger⟩ indicate a ⟨type⟩ event? [MASK]"
+def create_TC_input(node, item, trigger, tokenizer, max_context_length, lang):
+
+    if lang=="it":
+        prefix_template = f"〈type〉 e definito come ` 〈definition〉."
+        suffix_template = f"Il 〈trigger〉 indica un evento di tipo 〈type〉? [MASK]"
+    else:
+        prefix_template = f"⟨type⟩ is defined as ⟨definition⟩."
+        suffix_template = f"Does ⟨trigger⟩ indicate a ⟨type⟩ event? [MASK]"
 
     name, des, _ = id2node_detail[node]
     if des is None:

@@ -13,7 +13,7 @@ from model.dataset import SimpleDataset, collate_fn_TI_sen, collate_fn_TR_sen, c
 
 
 def tokenize_and_format(sentences, tokenizer, max_length=512):
-    tokenizer = BertTokenizer.from_pretrained('bert-base-uncased', do_lower_case=True)
+    tokenizer = BertTokenizer.from_pretrained('bert-base-multilingual-uncased', do_lower_case=True)
     data = []
     for sent_id, sentence in enumerate(sentences):
         tokens = tokenizer(sentence["text"], return_offsets_mapping=True, max_length=max_length, padding=False, truncation=True)
